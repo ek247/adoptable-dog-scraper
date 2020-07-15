@@ -67,7 +67,7 @@ public class StorageClient {
         }
     }
 
-    @Singleton
+    @ApplicationScoped
     @IfBuildProfile("prod")
     Storage remoteStorage() {
         return StorageOptions.newBuilder().setProjectId(PROJECT).build().getService();

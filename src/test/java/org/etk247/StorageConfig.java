@@ -3,13 +3,13 @@ package org.etk247;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.contrib.nio.testing.LocalStorageHelper;
 
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 
 import io.quarkus.arc.DefaultBean;
 
-@Singleton
+@ApplicationScoped
 public class StorageConfig {
-    @Singleton
+    @ApplicationScoped
     @DefaultBean
     Storage localStorage() {
         return LocalStorageHelper.getOptions().getService();
