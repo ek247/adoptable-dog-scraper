@@ -10,6 +10,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
@@ -24,8 +27,10 @@ import io.quarkus.arc.profile.IfBuildProfile;
 @ApplicationScoped
 public class StorageClient {
 
+    private static final Logger LOG = LoggerFactory.getLogger(StorageClient.class);
+
     private static final String PROJECT = "muddy-paws-scraper";
-    public static final String SNAPSHOT_BUCKET = "snapshots";
+    public static final String SNAPSHOT_BUCKET = "muddy-paws-scraper-snapshot";
     public static final String MOST_RECENT_FILENAME = "most_recent.txt";
 
     private final ObjectMapper objectMapper;
@@ -38,11 +43,16 @@ public class StorageClient {
     }
 
     public List<AdoptableDog> downloadLastDogsSnapshot() {
+        LOG.info("Downloading latest snapshot");
+
         Blob mostRecentFilePointer = storageService.get(BlobId.of(SNAPSHOT_BUCKET, MOST_RECENT_FILENAME));
 
         return Optional.ofNullable(mostRecentFilePointer).map(
             (pointer -> {
+                LOG.info("Found pointer, getting updated file");
                 String previousFileName = new String(mostRecentFilePointer.getContent(), StandardCharsets.UTF_8);
+
+                LOG.info("Newest filename {}", previousFileName);
                 Blob snapshot = storageService.get(BlobId.of(SNAPSHOT_BUCKET, previousFileName));
 
                 try {
@@ -56,6 +66,8 @@ public class StorageClient {
     }
 
     public void persistSnapshot(List<AdoptableDog> dogs) {
+        LOG.info("Persisting snapshot of {} dogs", dogs.size());
+
         BlobId blobId = BlobId.of(SNAPSHOT_BUCKET, MOST_RECENT_FILENAME);
         storageService.delete(blobId); //Remove old metadata. A bit hacky, but we're running this like every 10 minutes, so nbd
 

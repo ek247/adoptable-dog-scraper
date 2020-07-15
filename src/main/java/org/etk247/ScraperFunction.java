@@ -46,7 +46,7 @@ public class ScraperFunction implements RawBackgroundFunction {
 
     @Override
     public void accept(String event, Context context) {
-        LOG.info("Got event {}", event);
+        LOG.error("Got event {}", event);
 
         Set<AdoptableDog> previousSnapshot = new HashSet<>(storageClient.downloadLastDogsSnapshot());
         Set<AdoptableDog> currentSnapshot = new HashSet<>(scraper.scrapeAdoptableDogs());
@@ -55,6 +55,8 @@ public class ScraperFunction implements RawBackgroundFunction {
             .stream()
             .filter(not(previousSnapshot::contains))
             .collect(toList());
+
+        LOG.info("Found {} new dogs out of {} total", newDogs.size(), currentSnapshot.size());
 
         storageClient.persistSnapshot(newDogs);
 
