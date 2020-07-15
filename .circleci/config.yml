@@ -20,12 +20,16 @@ jobs:
       - run:
           name: Authorize GCloud Command Line Tool
           command: |
-            echo $GCLOUD_SERVICE_KEY | base64 --decode | gcloud auth activate-service-account --key-file=-
+            echo $GCLOUD_SERVICE_KEY | base64 --decode | gcloud auth activate-service-account $GCP_ACCOUNT --key-file=-
       - run:
           name: Deploy To Google Cloud Functions
           command: |
             # Variables
             # Deploy command
+            gcloud beta functions deploy quarkus-example-pubsub \
+              --entry-point=io.quarkus.gcp.functions.QuarkusBackgroundFunction \
+              --runtime=java11 --trigger-resource hello_topic --trigger-event google.pubsub.topic.publish --source=/tmp/workspace/deployment
+
             gcloud functions deploy scrapeFunction \
               --entry-point=io.quarkus.gcp.functions.QuarkusBackgroundFunction \
               --runtime java11 \
