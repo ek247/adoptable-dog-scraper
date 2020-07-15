@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    docker:
+      - image: circleci/openjdk:11.0.7-jdk-buster
+    steps:
       - checkout
       - run:
           name: build
@@ -34,7 +37,10 @@ workflows:
   version: 2
   build-test-and-deploy:
     jobs:
+      - build
       - deploy:
+          requires:
+            - build
           filters:
             branches:
               only:
