@@ -26,7 +26,7 @@ jobs:
           command: |
             # Variables
             # Deploy command
-            gcloud functions deploy $FUNCTION_NAME \
+            gcloud functions deploy scrapeFunction \
               --entry-point=io.quarkus.gcp.functions.QuarkusBackgroundFunction \
               --runtime java11 \
               --trigger-event google.pubsub.topic.publish \
