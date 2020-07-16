@@ -60,7 +60,7 @@ public class ScraperFunction implements RawBackgroundFunction {
 
         LOG.info("Found {} new dogs out of {} total", newDogs.size(), currentSnapshot.size());
 
-        storageClient.persistSnapshot(newDogs);
+        storageClient.persistSnapshot(currentSnapshot);
 
         Predicate<AdoptableDog> fuzzyMatches = new Predicate<>() {
             private final Set<String> DOG_KEYS = previousSnapshot
@@ -83,7 +83,8 @@ public class ScraperFunction implements RawBackgroundFunction {
             .filter(not(fuzzyMatches))
             .collect(toList());
 
-        Optional.of(dogsToAlertOn).filter(not(Collection::isEmpty))
+        Optional.of(dogsToAlertOn)
+            .filter(not(Collection::isEmpty))
             .ifPresent(dogs -> {
                 String emailString = dogs.stream().map(AdoptableDog::toEmailLine).collect(Collectors.joining("\n"));
                 recipients.forEach(recipent -> mailGunService.sendEmail(recipent, "New Dogs On Muddy Paws!", emailString));

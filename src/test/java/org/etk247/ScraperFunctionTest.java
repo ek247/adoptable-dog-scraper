@@ -24,6 +24,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @QuarkusTest
 public class ScraperFunctionTest {
@@ -50,7 +51,7 @@ public class ScraperFunctionTest {
     }
 
     @Test
-    public void testScraper() throws IOException {
+    public void whenDogs_sendsEmail_doesNotResendOnSecondRequest() throws IOException {
         muddyPawsWireMockServer.stubFor(get(urlEqualTo("/dogs"))
             .willReturn(aResponse()
                 .withStatus(200)
@@ -82,6 +83,23 @@ public class ScraperFunctionTest {
                 "Dog: name: Rootbeer, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/07/17/20200707172139.png, is available: Waitlist Full / Pending Adoption, breed Rottweiler/Shepherd, age 3 months\n" +
                 "Dog: name: London, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/09/20200710095543.png, is available: Available, breed Terrier, Jack Russell/Mix, age 6 years"))
         );
+
+        scraperFunction.accept("test", null);
+        muddyPawsWireMockServer.verify(2, getRequestedFor(urlEqualTo("/dogs")));
+        mailGunWireMockServer.verify(1, postRequestedFor(urlPathEqualTo("/messages")));
+    }
+
+    @Test
+    public void whenNoDogs_SendsNoEmail() throws IOException {
+        muddyPawsWireMockServer.stubFor(get(urlEqualTo("/dogs"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("[]")
+            ));
+
+        scraperFunction.accept("test", null);
+
+        muddyPawsWireMockServer.verify(1, getRequestedFor(urlEqualTo("/dogs")));
     }
 
 }

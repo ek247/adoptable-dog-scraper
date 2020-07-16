@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +73,7 @@ public class StorageClient {
         ).orElse(emptyList());
     }
 
-    public void persistSnapshot(List<AdoptableDog> dogs) {
+    public void persistSnapshot(Collection<AdoptableDog> dogs) {
         LOG.info("Persisting snapshot of {} dogs", dogs.size());
 
         BlobId mostRecentBlobId = BlobId.of(SNAPSHOT_BUCKET, MOST_RECENT_FILENAME);
