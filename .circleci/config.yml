@@ -33,7 +33,7 @@ jobs:
               --trigger-event google.pubsub.topic.publish \
               --source=/tmp/workspace/deployment \
               --project $GCP_PROJECT \
-              --set-env-vars RECIPIENTS=$RECIPIENTS,MAILGUN_API_KEY=$MAILGUN_API_KEY,FROM_EMAIL=$FROM_EMAIL
+              --set-env-vars RECIPIENTS=$RECIPIENTS,MAILGUN_API_KEY=$MAILGUN_API_KEY,FROM_EMAIL=$FROM_EMAIL,MAILGUN_API_URL=$MAILGUN_API_URL
 workflows:
   version: 2
   build-test-and-deploy:
