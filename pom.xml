@@ -68,11 +68,6 @@
       <artifactId>quarkus-google-cloud-functions</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>1.13.1</version>
-    </dependency>
-    <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-storage</artifactId>
     </dependency>

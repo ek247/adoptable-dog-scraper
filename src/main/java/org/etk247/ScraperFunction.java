@@ -74,7 +74,7 @@ public class ScraperFunction implements RawBackgroundFunction {
             }
 
             private String getKey(AdoptableDog dog) {
-                return new StringJoiner("-").add(dog.getName()).add(dog.getImageLink()).toString();
+                return new StringJoiner("-").add(dog.getName()).add(dog.getAge()).add(dog.getBreed()).toString();
             }
         };
 

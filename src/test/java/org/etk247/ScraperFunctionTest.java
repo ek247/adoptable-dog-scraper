@@ -53,7 +53,7 @@ public class ScraperFunctionTest {
         muddyPawsWireMockServer.stubFor(get(urlEqualTo("/dogs"))
             .willReturn(aResponse()
                 .withStatus(200)
-                .withBody(IOUtils.toString(getClass().getClassLoader().getResourceAsStream("test-dogs.html"), StandardCharsets.UTF_8))
+                .withBody(IOUtils.toString(getClass().getClassLoader().getResourceAsStream("test-dogs.json"), StandardCharsets.UTF_8))
             ));
         scraperFunction.accept("test", null);
 
@@ -61,19 +61,21 @@ public class ScraperFunctionTest {
         mailGunWireMockServer.verify(1, postRequestedFor(
             urlPathEqualTo("/mailgun/messages"))
             .withQueryParam("from", equalTo("test@test.com"))
-            .withQueryParam("text", equalTo("Dog: name: Blanca, image: https://www.muddypawsrescue.org/adoptable?dog=2527, is available: false, details [10 years, Looks like a Mixed Breed (Medium) mix]\n" +
-                "Dog: name: Juno, image: https://www.muddypawsrescue.org/adoptable?dog=2563, is available: false, details [2 years, Looks like a Terrier, Pit Bull/Mixed Breed (Large) mix]\n" +
-                "Dog: name: Tyr, image: https://www.muddypawsrescue.org/adoptable?dog=2610, is available: false, details [9 years, Looks like a Bulldog, English/Mixed Breed (Large) mix]\n" +
-                "Dog: name: Harlie, image: https://www.muddypawsrescue.org/adoptable?dog=2611, is available: false, details [2 years, Looks like a Catahoula Leopard Dog/Mixed Breed (Large) mix]\n" +
-                "Dog: name: Tank, image: https://www.muddypawsrescue.org/adoptable?dog=2590, is available: false, details [4 years, Looks like a Mastiff/Mixed Breed (Large) mix]\n" +
-                "Dog: name: Sid, image: https://www.muddypawsrescue.org/adoptable?dog=2594, is available: false, details [3 years, Looks like a Chihuahua/Mixed Breed (Small) mix]\n" +
-                "Dog: name: Rambo, image: https://www.muddypawsrescue.org/adoptable?dog=2552, is available: false, details [2 years, Looks like a Pyrenees, Great/Retriever, Golden mix]\n" +
-                "Dog: name: Barney, image: https://www.muddypawsrescue.org/adoptable?dog=2500, is available: false, details [8 years, Looks like a Shepherd/Mixed Breed (Medium) mix]\n" +
-                "Dog: name: Rootbeer, image: https://www.muddypawsrescue.org/adoptable?dog=2569, is available: false, details [3 months, Looks like a Rottweiler/Shepherd mix]\n" +
-                "Dog: name: Reba, image: https://www.muddypawsrescue.org/adoptable?dog=2466, is available: false, details [2 years, Looks like a Beagle/Shepherd mix]\n" +
-                "Dog: name: Marty, image: https://www.muddypawsrescue.org/adoptable?dog=2578, is available: false, details [3 months, Looks like a Shepherd/Mixed Breed (Medium) mix]\n" +
-                "Dog: name: Butter, image: https://www.muddypawsrescue.org/adoptable?dog=2568, is available: false, details [3 months, Looks like a Rottweiler/Shepherd mix]\n" +
-                "Dog: name: Bruce, image: https://www.muddypawsrescue.org/adoptable?dog=2609, is available: false, details [6 months, Looks like a Chihuahua/Mixed Breed (Small) mix]"))
+            .withQueryParam("text", equalTo("Dog: name: Marty, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/28/18/20200628180446.png, is available: Waitlist Full / Pending Adoption, breed Shepherd/Mixed Breed (Medium), age 3 months\n" +
+                "Dog: name: Sid, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710083812.png, is available: Waitlist Full / Pending Adoption, breed Chihuahua/Mixed Breed (Small), age 3 years\n" +
+                "Dog: name: Rambo, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/09/16/20200709161139.png, is available: Available, breed Pyrenees, Great/Retriever, Golden, age 2 years\n" +
+                "Dog: name: Kayla, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130803.png, is available: Waitlist Full / Pending Adoption, breed Pyrenees, Great/Mixed Breed (Large), age a year\n" +
+                "Dog: name: Tyr, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130215.png, is available: Available, breed Bulldog, English/Mixed Breed (Large), age 9 years\n" +
+                "Dog: name: Bruce, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/12/20200710125911.png, is available: Waitlist Full / Pending Adoption, breed Chihuahua/Mixed Breed (Small), age 6 months\n" +
+                "Dog: name: Barney, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/12/13/20200612134311.png, is available: Available, breed Shepherd/Mixed Breed (Medium), age 8 years\n" +
+                "Dog: name: Blanca, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/04/08/20200704081826.png, is available: Available, breed Mixed Breed (Medium), age 10 years\n" +
+                "Dog: name: Harlie, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130502.png, is available: Waitlist Full / Pending Adoption, breed Catahoula Leopard Dog/Mixed Breed (Large), age 2 years\n" +
+                "Dog: name: Tank, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/27/21/20200627210616.png, is available: Available, breed Mastiff/Mixed Breed (Large), age 4 years\n" +
+                "Dog: name: Juno, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/09/16/20200709161110.png, is available: Available, breed Terrier, Pit Bull/Mixed Breed (Large), age 2 years\n" +
+                "Dog: name: Reba, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/04/09/20200604093137.png, is available: Available, breed Beagle/Shepherd, age 2 years\n" +
+                "Dog: name: Hercules, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710084414.png, is available: Waitlist Full / Pending Adoption, breed Retriever, Labrador/Mixed Breed (Large), age 6 years\n" +
+                "Dog: name: Rootbeer, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/07/17/20200707172139.png, is available: Waitlist Full / Pending Adoption, breed Rottweiler/Shepherd, age 3 months\n" +
+                "Dog: name: London, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/09/20200710095543.png, is available: Available, breed Terrier, Jack Russell/Mix, age 6 years"))
         );
     }
 
