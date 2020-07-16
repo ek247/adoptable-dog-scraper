@@ -48,10 +48,10 @@ public class MailGunService {
             throw new RuntimeException(e);
         }
 
+        String encodedAuth = Base64.getEncoder().encodeToString(("api:" + apiKey).getBytes(StandardCharsets.UTF_8));
         HttpRequest request = HttpRequest.newBuilder(uri)
             .setHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded")
-            .header("content-type", "APPLICATION_FORM_URLENCODED")
-            .header(HttpHeaders.AUTHORIZATION, new String(Base64.getEncoder().encode(("api:" + apiKey).getBytes(StandardCharsets.UTF_8))))
+            .header("Authorization", "Basic " + encodedAuth)
             .POST(noBody())
             .build();
 
@@ -60,7 +60,7 @@ public class MailGunService {
             if ((response.statusCode() >= 200 && response.statusCode() <= 400)) {
                 LOG.info("Sucessfully sent email, {}, {}", response.statusCode(), response.body());
             } else {
-                LOG.error("Got exception when sending email, status code {}, body {}", response.statusCode(), response.body());
+                throw new RuntimeException(String.format("Got exception when sending email, status code %s, body %s", response.statusCode(), response.body()));
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

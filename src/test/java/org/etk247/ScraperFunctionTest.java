@@ -19,6 +19,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -33,7 +34,7 @@ public class ScraperFunctionTest {
     @ConfigProperty(name = "mailgun.api.url")
     private String mailgunUrl;
 
-    private final WireMockServer muddyPawsWireMockServer = new WireMockServer(options().bindAddress("127.0.0.1").port(8082));
+    private final WireMockServer muddyPawsWireMockServer = new WireMockServer(options().port(8082));
     private final WireMockServer mailGunWireMockServer = new WireMockServer(8083);
 
     @BeforeEach
@@ -55,11 +56,15 @@ public class ScraperFunctionTest {
                 .withStatus(200)
                 .withBody(IOUtils.toString(getClass().getClassLoader().getResourceAsStream("test-dogs.json"), StandardCharsets.UTF_8))
             ));
+        mailGunWireMockServer.stubFor(post(urlPathEqualTo("/messages"))
+            .willReturn(aResponse()
+                .withStatus(200)));
+
         scraperFunction.accept("test", null);
 
         muddyPawsWireMockServer.verify(1, getRequestedFor(urlEqualTo("/dogs")));
         mailGunWireMockServer.verify(1, postRequestedFor(
-            urlPathEqualTo("/mailgun/messages"))
+            urlPathEqualTo("/messages"))
             .withQueryParam("from", equalTo("Dog Notifier <test@test.com>"))
             .withQueryParam("text", equalTo("Dog: name: Marty, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/28/18/20200628180446.png, is available: Waitlist Full / Pending Adoption, breed Shepherd/Mixed Breed (Medium), age 3 months\n" +
                 "Dog: name: Sid, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710083812.png, is available: Waitlist Full / Pending Adoption, breed Chihuahua/Mixed Breed (Small), age 3 years\n" +
