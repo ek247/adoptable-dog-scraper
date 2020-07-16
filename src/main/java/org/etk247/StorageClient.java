@@ -10,10 +10,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.checkerframework.checker.nullness.Opt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.quarkus.arc.profile.IfBuildProfile;
+
+import static java.util.Collections.emptyList;
 
 @ApplicationScoped
 public class StorageClient {
@@ -53,30 +57,35 @@ public class StorageClient {
                 String previousFileName = new String(mostRecentFilePointer.getContent(), StandardCharsets.UTF_8);
 
                 LOG.info("Newest filename {}", previousFileName);
-                Blob snapshot = storageService.get(BlobId.of(SNAPSHOT_BUCKET, previousFileName));
+                Optional<Blob> snapshot = Optional.ofNullable(storageService.get(BlobId.of(SNAPSHOT_BUCKET, previousFileName)));
 
                 try {
-                    return objectMapper.readValue(new String(snapshot.getContent(), StandardCharsets.UTF_8), new TypeReference<List<AdoptableDog>>() {
-                    });
+                    return snapshot
+                        .map(blob -> objectMapper.readValue(new String(blob.getContent(), StandardCharsets.UTF_8), new TypeReference<List<AdoptableDog>>() {}))
+                        .orElse(emptyList());
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
             })
-        ).orElse(Collections.emptyList());
+        ).orElse(emptyList());
     }
 
     public void persistSnapshot(List<AdoptableDog> dogs) {
         LOG.info("Persisting snapshot of {} dogs", dogs.size());
 
-        BlobId blobId = BlobId.of(SNAPSHOT_BUCKET, MOST_RECENT_FILENAME);
-        storageService.delete(blobId); //Remove old metadata. A bit hacky, but we're running this like every 10 minutes, so nbd
+        BlobId mostRecentBlobId = BlobId.of(SNAPSHOT_BUCKET, MOST_RECENT_FILENAME);
+        storageService.delete(mostRecentBlobId); //Remove old metadata. A bit hacky, but we're running this like every 10 minutes, so nbd
 
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(mostRecentBlobId).build();
+        String newFileName = "SNAPSHOT-" + Instant.now().toEpochMilli();
+        BlobInfo newFileBlobInfo = BlobInfo.newBuilder(BlobId.of(SNAPSHOT_BUCKET, newFileName)).build();
         try {
-            storageService.create(blobInfo, objectMapper.writeValueAsBytes(dogs));
+            storageService.create(newFileBlobInfo, objectMapper.writeValueAsBytes(dogs));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+
+        storageService.create(blobInfo, newFileName.getBytes(StandardCharsets.UTF_8));
     }
 
     @ApplicationScoped
