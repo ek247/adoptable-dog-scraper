@@ -59,13 +59,15 @@ public class StorageClient {
                 LOG.info("Newest filename {}", previousFileName);
                 Optional<Blob> snapshot = Optional.ofNullable(storageService.get(BlobId.of(SNAPSHOT_BUCKET, previousFileName)));
 
-                try {
-                    return snapshot
-                        .map(blob -> objectMapper.readValue(new String(blob.getContent(), StandardCharsets.UTF_8), new TypeReference<List<AdoptableDog>>() {}))
-                        .orElse(emptyList());
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+                return snapshot
+                    .map(blob -> {
+                        try {
+                            return objectMapper.readValue(new String(blob.getContent(), StandardCharsets.UTF_8), new TypeReference<List<AdoptableDog>>() {});
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .orElse(emptyList());
             })
         ).orElse(emptyList());
     }
