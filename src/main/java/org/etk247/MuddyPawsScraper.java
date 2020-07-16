@@ -5,6 +5,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,12 +18,17 @@ import static java.util.stream.Collectors.toList;
 @ApplicationScoped
 public class MuddyPawsScraper {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MuddyPawsScraper.class);
+
     @ConfigProperty(name = "muddypaws.url")
     private String muddyPawsUrl;
 
     public List<AdoptableDog> scrapeAdoptableDogs() {
         try {
+            LOG.info("Starting scrape");
             Document doc = Jsoup.connect(muddyPawsUrl).get();
+            LOG.info("Finished scrape");
+
             Elements dogNodes = doc.body()
                 .select(".Main-content")
                 .select(".card");

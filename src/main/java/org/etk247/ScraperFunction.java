@@ -7,8 +7,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
@@ -81,7 +83,10 @@ public class ScraperFunction implements RawBackgroundFunction {
             .filter(not(fuzzyMatches))
             .collect(toList());
 
-        String emailString = dogsToAlertOn.stream().map(AdoptableDog::toEmailLine).collect(Collectors.joining("\n"));
-        recipients.forEach(recipent -> mailGunService.sendEmail(recipent, "New Dogs On Muddy Paws!", emailString));
+        Optional.of(dogsToAlertOn).filter(not(Collection::isEmpty))
+            .ifPresent(dogs -> {
+                String emailString = dogs.stream().map(AdoptableDog::toEmailLine).collect(Collectors.joining("\n"));
+                recipients.forEach(recipent -> mailGunService.sendEmail(recipent, "New Dogs On Muddy Paws!", emailString));
+            });
     }
 }
