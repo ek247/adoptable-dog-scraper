@@ -56,9 +56,9 @@ public class MailGunService {
             .build();
 
         try {
-            HttpResponse<?> response = httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+            HttpResponse<?> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if ((response.statusCode() >= 200 && response.statusCode() <= 400)) {
-                LOG.info("Sucessfully sent email, {}", response.statusCode());
+                LOG.info("Sucessfully sent email, {}, {}", response.statusCode(), response.body());
             } else {
                 LOG.error("Got exception when sending email, status code {}, body {}", response.statusCode(), response.body());
             }
