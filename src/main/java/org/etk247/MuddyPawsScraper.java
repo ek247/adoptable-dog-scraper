@@ -25,9 +25,9 @@ public class MuddyPawsScraper {
 
     public List<AdoptableDog> scrapeAdoptableDogs() {
         try {
-            LOG.info("Starting scrape");
+            LOG.info("Starting scrape of {}", muddyPawsUrl);
             Document doc = Jsoup.connect(muddyPawsUrl).get();
-            LOG.info("Finished scrape");
+            LOG.info("Finished scrape of {}", doc.toString());
 
             Elements dogNodes = doc.body()
                 .select(".Main-content")
