@@ -39,7 +39,7 @@ public class MailGunService {
         URI uri;
         try {
             uri = new URIBuilder(mailgunUrl + "/messages")
-                .addParameter("from", fromEmail)
+                .addParameter("from", String.format("Dog Notifier <%s>", fromEmail))
                 .addParameter("to", to)
                 .addParameter("subject", subject)
                 .addParameter("text", text)

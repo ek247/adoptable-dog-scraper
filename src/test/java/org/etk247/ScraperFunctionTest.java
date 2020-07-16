@@ -60,7 +60,7 @@ public class ScraperFunctionTest {
         muddyPawsWireMockServer.verify(1, getRequestedFor(urlEqualTo("/dogs")));
         mailGunWireMockServer.verify(1, postRequestedFor(
             urlPathEqualTo("/mailgun/messages"))
-            .withQueryParam("from", equalTo("test@test.com"))
+            .withQueryParam("from", equalTo("Dog Notifier <test@test.com>"))
             .withQueryParam("text", equalTo("Dog: name: Marty, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/28/18/20200628180446.png, is available: Waitlist Full / Pending Adoption, breed Shepherd/Mixed Breed (Medium), age 3 months\n" +
                 "Dog: name: Sid, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710083812.png, is available: Waitlist Full / Pending Adoption, breed Chihuahua/Mixed Breed (Small), age 3 years\n" +
                 "Dog: name: Rambo, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/09/16/20200709161139.png, is available: Available, breed Pyrenees, Great/Retriever, Golden, age 2 years\n" +
