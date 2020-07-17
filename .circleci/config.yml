@@ -22,6 +22,13 @@ jobs:
           command: |
             echo $GCLOUD_SERVICE_KEY | base64 --decode | gcloud auth activate-service-account $GCP_ACCOUNT --key-file=-
       - run:
+          name: Create env vars file
+          command: |
+            echo "RECIPIENTS: $RECIPIENTS" >> env.yml && \
+            echo "MAILGUN_API_KEY: $MAILGUN_API_KEY" >> env.yml && \
+            echo "FROM_EMAIL: $FROM_EMAIL" >> env.yml && \
+            echo "MAILGUN_API_URL: $MAILGUN_API_URL" >> env.yml
+      - run:
           name: Deploy To Google Cloud Functions
           command: |
             # Variables
@@ -33,7 +40,7 @@ jobs:
               --trigger-event google.pubsub.topic.publish \
               --source=/tmp/workspace/deployment \
               --project $GCP_PROJECT \
-              --set-env-vars RECIPIENTS=$RECIPIENTS,MAILGUN_API_KEY=$MAILGUN_API_KEY,FROM_EMAIL=$FROM_EMAIL,MAILGUN_API_URL=$MAILGUN_API_URL
+              --env-vars-file env.yml
 workflows:
   version: 2
   build-test-and-deploy:
