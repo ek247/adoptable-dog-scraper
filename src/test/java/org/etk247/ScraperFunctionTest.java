@@ -67,21 +67,100 @@ public class ScraperFunctionTest {
         mailGunWireMockServer.verify(1, postRequestedFor(
             urlPathEqualTo("/messages"))
             .withQueryParam("from", equalTo("Dog Notifier <test@test.com>"))
-            .withQueryParam("text", equalTo("Dog: name: Marty, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/28/18/20200628180446.png, is available: Waitlist Full / Pending Adoption, breed Shepherd/Mixed Breed (Medium), age 3 months\n" +
-                "Dog: name: Sid, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710083812.png, is available: Waitlist Full / Pending Adoption, breed Chihuahua/Mixed Breed (Small), age 3 years\n" +
-                "Dog: name: Rambo, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/09/16/20200709161139.png, is available: Available, breed Pyrenees, Great/Retriever, Golden, age 2 years\n" +
-                "Dog: name: Kayla, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130803.png, is available: Waitlist Full / Pending Adoption, breed Pyrenees, Great/Mixed Breed (Large), age a year\n" +
-                "Dog: name: Tyr, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130215.png, is available: Available, breed Bulldog, English/Mixed Breed (Large), age 9 years\n" +
-                "Dog: name: Bruce, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/12/20200710125911.png, is available: Waitlist Full / Pending Adoption, breed Chihuahua/Mixed Breed (Small), age 6 months\n" +
-                "Dog: name: Barney, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/12/13/20200612134311.png, is available: Available, breed Shepherd/Mixed Breed (Medium), age 8 years\n" +
-                "Dog: name: Blanca, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/04/08/20200704081826.png, is available: Available, breed Mixed Breed (Medium), age 10 years\n" +
-                "Dog: name: Harlie, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130502.png, is available: Waitlist Full / Pending Adoption, breed Catahoula Leopard Dog/Mixed Breed (Large), age 2 years\n" +
-                "Dog: name: Tank, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/27/21/20200627210616.png, is available: Available, breed Mastiff/Mixed Breed (Large), age 4 years\n" +
-                "Dog: name: Juno, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/09/16/20200709161110.png, is available: Available, breed Terrier, Pit Bull/Mixed Breed (Large), age 2 years\n" +
-                "Dog: name: Reba, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/04/09/20200604093137.png, is available: Available, breed Beagle/Shepherd, age 2 years\n" +
-                "Dog: name: Hercules, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710084414.png, is available: Waitlist Full / Pending Adoption, breed Retriever, Labrador/Mixed Breed (Large), age 6 years\n" +
-                "Dog: name: Rootbeer, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/07/17/20200707172139.png, is available: Waitlist Full / Pending Adoption, breed Rottweiler/Shepherd, age 3 months\n" +
-                "Dog: name: London, image: https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/09/20200710095543.png, is available: Available, breed Terrier, Jack Russell/Mix, age 6 years"))
+            .withQueryParam("html", equalTo("<html><body><table><tr> <th> Name </th>\n" +
+                "<th> Image </th>\n" +
+                "<th> Age </th>\n" +
+                "<th> Breed </th>\n" +
+                "<th> Status </th> </tr><tr> <th> Marty </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/28/18/20200628180446.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 3 months </th>\n" +
+                "<th> Shepherd/Mixed Breed (Medium) </th>\n" +
+                "<th> Waitlist Full / Pending Adoption </th> </tr>\n" +
+                "<tr> <th> Sid </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710083812.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 3 years </th>\n" +
+                "<th> Chihuahua/Mixed Breed (Small) </th>\n" +
+                "<th> Waitlist Full / Pending Adoption </th> </tr>\n" +
+                "<tr> <th> Rambo </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/09/16/20200709161139.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 2 years </th>\n" +
+                "<th> Pyrenees, Great/Retriever, Golden </th>\n" +
+                "<th> Available </th> </tr>\n" +
+                "<tr> <th> Kayla </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130803.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> a year </th>\n" +
+                "<th> Pyrenees, Great/Mixed Breed (Large) </th>\n" +
+                "<th> Waitlist Full / Pending Adoption </th> </tr>\n" +
+                "<tr> <th> Tyr </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130215.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 9 years </th>\n" +
+                "<th> Bulldog, English/Mixed Breed (Large) </th>\n" +
+                "<th> Available </th> </tr>\n" +
+                "<tr> <th> Bruce </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/12/20200710125911.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 6 months </th>\n" +
+                "<th> Chihuahua/Mixed Breed (Small) </th>\n" +
+                "<th> Waitlist Full / Pending Adoption </th> </tr>\n" +
+                "<tr> <th> Barney </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/12/13/20200612134311.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 8 years </th>\n" +
+                "<th> Shepherd/Mixed Breed (Medium) </th>\n" +
+                "<th> Available </th> </tr>\n" +
+                "<tr> <th> Blanca </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/04/08/20200704081826.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 10 years </th>\n" +
+                "<th> Mixed Breed (Medium) </th>\n" +
+                "<th> Available </th> </tr>\n" +
+                "<tr> <th> Harlie </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/13/20200710130502.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 2 years </th>\n" +
+                "<th> Catahoula Leopard Dog/Mixed Breed (Large) </th>\n" +
+                "<th> Waitlist Full / Pending Adoption </th> </tr>\n" +
+                "<tr> <th> Tank </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/27/21/20200627210616.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 4 years </th>\n" +
+                "<th> Mastiff/Mixed Breed (Large) </th>\n" +
+                "<th> Available </th> </tr>\n" +
+                "<tr> <th> Juno </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/09/16/20200709161110.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 2 years </th>\n" +
+                "<th> Terrier, Pit Bull/Mixed Breed (Large) </th>\n" +
+                "<th> Available </th> </tr>\n" +
+                "<tr> <th> Reba </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/06/04/09/20200604093137.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 2 years </th>\n" +
+                "<th> Beagle/Shepherd </th>\n" +
+                "<th> Available </th> </tr>\n" +
+                "<tr> <th> Hercules </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/08/20200710084414.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 6 years </th>\n" +
+                "<th> Retriever, Labrador/Mixed Breed (Large) </th>\n" +
+                "<th> Waitlist Full / Pending Adoption </th> </tr>\n" +
+                "<tr> <th> Rootbeer </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/07/17/20200707172139.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 3 months </th>\n" +
+                "<th> Rottweiler/Shepherd </th>\n" +
+                "<th> Waitlist Full / Pending Adoption </th> </tr>\n" +
+                "<tr> <th> London </th>\n" +
+                "<th> <img src=\"https://www.shelterluv.com/sites/default/files/animal_pics/12799/2020/07/10/09/20200710095543.png\" style=\"width:128px;height:128px;\">\n" +
+                " </th>\n" +
+                "<th> 6 years </th>\n" +
+                "<th> Terrier, Jack Russell/Mix </th>\n" +
+                "<th> Available </th> </tr></table></body></html>"))
         );
 
         scraperFunction.accept("test", null);

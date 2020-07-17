@@ -15,6 +15,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 import javax.inject.Singleton;
 
@@ -33,8 +34,9 @@ public class MailGunService {
     @ConfigProperty(name = "mailgun.from-email")
     private String fromEmail;
 
-    public void sendEmail(String to, String subject, String text) {
+    public void sendEmail(String to, String subject, List<AdoptableDog> dogs) {
         HttpClient httpClient = HttpClient.newBuilder().build();
+
 
         URI uri;
         try {
@@ -42,7 +44,7 @@ public class MailGunService {
                 .addParameter("from", String.format("Dog Notifier <%s>", fromEmail))
                 .addParameter("to", to)
                 .addParameter("subject", subject)
-                .addParameter("text", text)
+                .addParameter("html", getHtml(dogs))
                 .build();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -65,5 +67,16 @@ public class MailGunService {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getHtml(List<AdoptableDog> dogs) {
+        return new EmailBuilder()
+            .withRows(dogs)
+            .withColumn("Name", AdoptableDog::getName)
+            .withColumn("Image", (dog) -> String.format("<img src=\"%s\" style=\"width:128px;height:128px;\">\n", dog.getPhotos().iterator().next()))
+            .withColumn("Age", AdoptableDog::getAge)
+            .withColumn("Breed", AdoptableDog::getBreed)
+            .withColumn("Status", AdoptableDog::getStatus)
+            .buildHtml();
     }
 }

@@ -85,9 +85,6 @@ public class ScraperFunction implements RawBackgroundFunction {
 
         Optional.of(dogsToAlertOn)
             .filter(not(Collection::isEmpty))
-            .ifPresent(dogs -> {
-                String emailString = dogs.stream().map(AdoptableDog::toEmailLine).collect(Collectors.joining("\n"));
-                recipients.forEach(recipent -> mailGunService.sendEmail(recipent, "New Dogs On Muddy Paws!", emailString));
-            });
+            .ifPresent(dogs -> recipients.forEach(recipent -> mailGunService.sendEmail(recipent, "New Dogs On Muddy Paws!", dogsToAlertOn)));
     }
 }
