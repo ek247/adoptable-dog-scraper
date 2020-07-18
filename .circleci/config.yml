@@ -31,7 +31,7 @@ jobs:
             echo "FROM_EMAIL: $FROM_EMAIL" >> env.yml && \
             echo "MAILGUN_API_URL: $MAILGUN_API_URL" >> env.yml && \
             echo "GCP_PROJECT: $GCP_PROJECT" >> env.yml && \
-            echo "GCP_BUCKET_NAME: GCP_BUCKET_NAME" >> env.yml
+            echo "GCP_BUCKET_NAME: $GCP_BUCKET_NAME" >> env.yml
 
       - run:
           name: Deploy To Google Cloud Functions
