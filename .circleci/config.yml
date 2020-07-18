@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:11.0.7-jdk-buster
+    resource_class: small
     steps:
       - checkout
       - run:
@@ -14,6 +15,7 @@ jobs:
   deploy:
     docker:
       - image: google/cloud-sdk
+    resource_class: small
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -27,7 +29,10 @@ jobs:
             echo "RECIPIENTS: $RECIPIENTS" >> env.yml && \
             echo "MAILGUN_API_KEY: $MAILGUN_API_KEY" >> env.yml && \
             echo "FROM_EMAIL: $FROM_EMAIL" >> env.yml && \
-            echo "MAILGUN_API_URL: $MAILGUN_API_URL" >> env.yml
+            echo "MAILGUN_API_URL: $MAILGUN_API_URL" >> env.yml && \
+            echo "GCP_PROJECT: $GCP_PROJECT" >> env.yml && \
+            echo "GCP_BUCKET_NAME: GCP_BUCKET_NAME" >> env.yml
+
       - run:
           name: Deploy To Google Cloud Functions
           command: |

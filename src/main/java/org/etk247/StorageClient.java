@@ -10,20 +10,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.checkerframework.checker.nullness.Opt;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import io.quarkus.arc.profile.IfBuildProfile;
 
@@ -34,8 +32,12 @@ public class StorageClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(StorageClient.class);
 
-    private static final String PROJECT = "muddy-paws-scraper";
-    public static final String SNAPSHOT_BUCKET = "muddy-paws-scraper-snapshot";
+    @ConfigProperty(name = "gcp.project.name")
+    private String project;
+
+    @ConfigProperty(name = "gcp.bucket.name")
+    public String snapshotBucket;
+
     public static final String MOST_RECENT_FILENAME = "most_recent.txt";
 
     private final ObjectMapper objectMapper;
@@ -50,7 +52,7 @@ public class StorageClient {
     public List<AdoptableDog> downloadLastDogsSnapshot() {
         LOG.info("Downloading latest snapshot");
 
-        Blob mostRecentFilePointer = storageService.get(BlobId.of(SNAPSHOT_BUCKET, MOST_RECENT_FILENAME));
+        Blob mostRecentFilePointer = storageService.get(BlobId.of(snapshotBucket, MOST_RECENT_FILENAME));
 
         return Optional.ofNullable(mostRecentFilePointer).map(
             (pointer -> {
@@ -58,7 +60,7 @@ public class StorageClient {
                 String previousFileName = new String(mostRecentFilePointer.getContent(), StandardCharsets.UTF_8);
 
                 LOG.info("Newest filename {}", previousFileName);
-                Optional<Blob> snapshot = Optional.ofNullable(storageService.get(BlobId.of(SNAPSHOT_BUCKET, previousFileName)));
+                Optional<Blob> snapshot = Optional.ofNullable(storageService.get(BlobId.of(snapshotBucket, previousFileName)));
 
                 return snapshot
                     .map(blob -> {
@@ -76,12 +78,12 @@ public class StorageClient {
     public void persistSnapshot(Collection<AdoptableDog> dogs) {
         LOG.info("Persisting snapshot of {} dogs", dogs.size());
 
-        BlobId mostRecentBlobId = BlobId.of(SNAPSHOT_BUCKET, MOST_RECENT_FILENAME);
+        BlobId mostRecentBlobId = BlobId.of(snapshotBucket, MOST_RECENT_FILENAME);
         storageService.delete(mostRecentBlobId); //Remove old metadata. A bit hacky, but we're running this like every 10 minutes, so nbd
 
         BlobInfo blobInfo = BlobInfo.newBuilder(mostRecentBlobId).build();
         String newFileName = "SNAPSHOT-" + Instant.now().toEpochMilli();
-        BlobInfo newFileBlobInfo = BlobInfo.newBuilder(BlobId.of(SNAPSHOT_BUCKET, newFileName)).build();
+        BlobInfo newFileBlobInfo = BlobInfo.newBuilder(BlobId.of(snapshotBucket, newFileName)).build();
         try {
             storageService.create(newFileBlobInfo, objectMapper.writeValueAsBytes(dogs));
         } catch (JsonProcessingException e) {
@@ -94,6 +96,6 @@ public class StorageClient {
     @ApplicationScoped
     @IfBuildProfile("prod")
     Storage remoteStorage() {
-        return StorageOptions.newBuilder().setProjectId(PROJECT).build().getService();
+        return StorageOptions.newBuilder().setProjectId(project).build().getService();
     }
 }
